@@ -1,72 +1,39 @@
 # Maison de Scent
 
-A bilingual (English / Turkish) perfume catalogue and recommendation site. Browse 300 fragrances, filter by gender, olfactory family, and season, read full note pyramids in a detail modal, and get personalised recommendations by picking the notes you love.
+A small perfume catalogue and recommendation site I built to combine two things I like: fragrance, and working with real data instead of placeholder content. It covers 300 real fragrances pulled from a public dataset, lets you filter and search them, and has a "For You" mode where you pick notes you like and it suggests fragrances based on that.
+
+The whole interface works in English and Turkish, including the note names themselves, not just the buttons and labels.
+
+## What it does
+
+- Browse and filter 300 fragrances by gender, olfactory family, and season, with live text search across name, brand, and notes
+- Click any fragrance to see its full note pyramid (top / heart / base), main accords, year, and rating
+- "Find similar" inside that detail view, which surfaces the closest fragrances by scent profile
+- A separate "For You" tab where you build a small profile from notes you like and get a ranked list of matches, each one showing exactly which notes it shares with your picks
+- Full English/Turkish interface, with the language choice remembered between visits
+- No frameworks, no build step — plain HTML, CSS, and JavaScript
+
+## How the recommendation actually works
+
+Each fragrance gets turned into a weighted set of features: its notes and its main accords. Base notes carry the most weight, since they're what's left once the top notes burn off — they define how a fragrance actually smells after the first twenty minutes. Heart notes come next, top notes least, and accords sit a bit above heart notes because they represent the overall character the perfumer was going for rather than a single raw ingredient.
+
+"Find similar" compares two fragrances with weighted cosine similarity: roughly, how much their feature sets point in the same direction, regardless of how many notes either one happens to list. A small bonus gets added if they share the same olfactory family, but it's deliberately tiny so it can't outweigh a genuinely strong note overlap from a different family.
+
+"For You" works the same way in reverse. Your selected notes become a profile, every fragrance gets scored against it, and the score is normalised so a fragrance with twenty notes doesn't automatically beat one with six just because it has more surface area to match against. Gender and season aren't hard filters — they nudge the ranking up or down a little, because a "men's" fragrance can still genuinely suit someone who picked "women," and I'd rather rank that lower than hide it completely.
+
+## Language
+
+Almost everything is translated, including the individual notes in the dataset, not just the interface labels. A handful of more obscure or purely synthetic notes (things like ambroxan or iso e super) stay in English on both sides, since there isn't really a Turkish equivalent and forcing one would just be confusing. The recommendation logic always runs on the original English keys underneath, so switching languages mid-session never changes how anything is scored — only how it's displayed.
+
+## Tech
+
+- Plain HTML, CSS, and JavaScript — no frameworks, no dependencies
+- Google Fonts (Cormorant Garamond for headings, Inter for everything else)
+- All fragrance and translation data is bundled into a single JS file, so the site runs straight from the filesystem with no server needed
 
 
+## About the data
 
----
+The fragrance data comes from the "Fragrantica.com Fragrance Dataset" on Kaggle (uploaded by olgagmiufana1), originally compiled from Fragrantica.com. It's licensed under CC BY-NC-SA 4.0. I cleaned it and narrowed it down to 300 fragrances — 100 men's, 100 women's, 100 unisex — for this project, and the resulting dataset is shared under that same license. This is a non-commercial, educational project.
 
-## Features
-
-- **Catalogue** — live search across name, brand, and notes; four combinable filters; responsive 3-4 column card grid
-- **Detail modal** — full top / heart / base note pyramid, accords, rating, and a "find similar" button that surfaces the five closest fragrances using cosine similarity
-- **For You** — pick notes from a searchable pool, set optional gender and season preferences, and get a ranked list of 12 matches with the shared notes highlighted
-- **Bilingual** — full EN / TR interface including note and accord translations; language persists across visits
-- **Zero dependencies** — vanilla HTML, CSS, and JavaScript; runs by opening `index.html`
-
----
-
-## How the recommendation works
-
-Every fragrance is represented as a weighted feature vector. Base notes get a weight of 3, heart notes 2, top notes 1, and accords 2.5. I weighted base notes highest because they define a fragrance's lasting character — the dry-down is what you live with. Top notes evaporate quickly, so they matter less for matching.
-
-**Find similar** computes the weighted cosine similarity between two fragrance vectors. Cosine similarity looks at the *angle* between vectors, not their length, so a fragrance with many notes isn't automatically ranked above one with fewer. A small bonus (0.04) is added when two fragrances share the same olfactory family.
-
-**For You** builds a profile from your selected notes (each weighted 1.0), then scores every fragrance by how much of its weighted note mass overlaps with your selection, normalised by the fragrance's total possible weight. Gender and season preferences apply multiplicative boosts (×1.15 and ×1.10 for a match, ×0.75 for a gender mismatch), so they nudge the ranking without hard-filtering anything out.
-
----
-
-## Tech stack
-
-- HTML5 / CSS3 (custom properties, CSS Grid, no frameworks)
-- Vanilla JavaScript (ES6+, IIFE module pattern)
-- Google Fonts: Cormorant Garamond + Inter
-- No build step, no bundler, no dependencies
-
----
-
-## Running locally
-
-Just open `index.html` in any modern browser. Everything is self-contained — the fragrance data and translations are embedded in `data.js` as globals.
-
-```
-open maison-de-scent/index.html        # macOS
-start maison-de-scent/index.html       # Windows
-xdg-open maison-de-scent/index.html    # Linux
-```
-
----
-
-## Deploying to GitHub Pages
-
-1. Create a repository called `maison-de-scent` on GitHub.
-2. Push the project folder contents (not the folder itself) to the `main` branch:
-   ```bash
-   cd maison-de-scent
-   git init
-   git add .
-   git commit -m "Initial commit"
-   git remote add origin https://github.com/YOUR_USERNAME/maison-de-scent.git
-   git push -u origin main
-   ```
-3. Go to **Settings → Pages** in your repository.
-4. Under **Source**, choose **Deploy from a branch**, select `main`, and set the folder to `/ (root)`.
-5. Save — GitHub will provide a URL in the form `https://YOUR_USERNAME.github.io/maison-de-scent/` within a minute or two.
-
----
-
-## Data attribution
-
-Fragrance data: "Fragrantica.com Fragrance Dataset" (Kaggle, uploader: olgagmiufana1), originally from Fragrantica.com. Licensed under CC BY-NC-SA 4.0. Cleaned and reduced to 300 perfumes for this non-commercial educational project; derived data shared under the same license.
-
-The site code is MIT licensed. The fragrance data is CC BY-NC-SA 4.0.
+The code itself is MIT licensed.
