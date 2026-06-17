@@ -2,7 +2,7 @@
 
 A bilingual (English / Turkish) perfume catalogue and recommendation site. Browse 300 fragrances, filter by gender, olfactory family, and season, read full note pyramids in a detail modal, and get personalised recommendations by picking the notes you love.
 
-![screenshot placeholder — add one after deploy]
+
 
 ---
 
